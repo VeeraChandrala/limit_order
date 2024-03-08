@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 public class LimitOrderAgent implements PriceListener {
 
     public ExecutionClient ec;
-    private final List<Orders> orders;
+    private final HashMap<String, List<Orders>> ordersMap;
 
     public LimitOrderAgent(final ExecutionClient ec, List<Orders> orders) {
         this.orders = orders;
@@ -17,9 +17,11 @@ public class LimitOrderAgent implements PriceListener {
 
 
     @Override
-    public void priceTick(String productId, BigDecimal price) {
+    public void priceTick(String productId1, BigDecimal price1) {
 
-        BigDecimal bg = new BigDecimal("100");
+        
+
+        /*BigDecimal bg = new BigDecimal("100");
     	
     	if(productId == "IBM" && price.compareTo(bg) < 1) {
     		try {
@@ -27,15 +29,41 @@ public class LimitOrderAgent implements PriceListener {
 			} catch (ExecutionException e) {
 				e.printStackTrace();
 			}
-    	}
+    	}*/
+        List<Order> orders = ordersMap.get(productId1);
+        execute(productId, orders, price1);
+
 
     }
 
     public void addOrder(String actionFlag, String productId, int amount, BigDecimal limit) {
 
-			 Orders order = new Orders(actionFlag, productId, amount, limit);
-			 orders.add(order);
-             orders.stream().map(o->{if(o.actionFlag == sell && limit.compareTo(PriceListener.priceTick(o.productId))<1){ec.sell(o.productId,o.amount)} else if(o.actionFlag == buy && limit.compareTo(PriceListener.priceTick(o.productId))<1){ec.buy(o.productId,o.amount)} });
-	}
+			 Order order = new Order(actionFlag, productId, amount, limit);
+             if(ordersMap.contains(productId))
+             ordersMap.put(productId, ordersMap.get(productId).add(order));
+             else
+			 ordersMap.put(productId, List.of(order));
+
+    }
+
+    public void execute( List<Orders> orders, price1)
+    {
+        String productId = orders.get(0).getProductId();
+        List<Orders> orders1 = new Arraylist<>();
+     While(o::Orders)
+        {
+            if(o.getActionFlag() == "sell" && o.getLimit()>=price1)
+            {
+                ec.sell(productId1,order.getAmount);
+                orders1.add(o);
+            }
+            if(o.getActionFlag() == "buy" && order.getLimit()<=price1)
+            {
+                ec.buy(productId1,order.getAmount);
+                orders1.add(o) ;
+            }
+        }
+    ordersMap.put(productId,orders.stream().filter(o-> orders1.isNotPresent(o)).collect(Collectors.toList()));
+    }
 
 }
